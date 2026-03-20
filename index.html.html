@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Awareness Training</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1a2a3a; min-height: 100vh; }
+
+  /* Top header bar */
+  .top-bar { background: linear-gradient(135deg, #0077b6, #00b4d8); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar-logo { color: white; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .top-bar-logo span { opacity: 0.85; font-weight: 400; }
+  .top-bar-title { color: rgba(255,255,255,0.75); font-size: 12px; }
+
+  #app { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* Progress bar */
+  .progress-container { background: #e8f0f8; border-radius: 20px; height: 8px; margin-bottom: 24px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #0077b6, #00b4d8); border-radius: 20px; transition: width 0.6s ease; }
+  .progress-label { text-align: right; font-size: 12px; color: #334e68; margin-bottom: 6px; font-weight: 600; }
+
+  /* Slide */
+  .slide { display: none; animation: fadeIn 0.5s ease; }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Title slide */
+  .title-slide { text-align: center; padding: 40px 20px; }
+  .shield-icon { font-size: 72px; margin-bottom: 20px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+  .title-slide h1 { font-size: 2.4em; font-weight: 800; background: linear-gradient(90deg, #0077b6, #00b4d8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .title-slide .subtitle { color: #1e3a52; font-size: 1.1em; margin-bottom: 30px; font-weight: 500; }
+  .module-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .pill { background: #dceefb; border: 1px solid #90c4e4; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #004e89; font-weight: 700; }
+  .prepared-by-title { font-size: 13px; color: #1e3a52; margin-bottom: 32px; letter-spacing: 0.3px; font-weight: 500; }
+  .prepared-by-title strong { color: #0077b6; }
+
+  /* Info slide */
+  .info-slide { }
+  .slide-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .slide-tag { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .slide-tag.warning { background: linear-gradient(135deg, #e63946, #c1121f); }
+  .slide-tag.tip { background: linear-gradient(135deg, #2d6a4f, #40916c); }
+  .slide-title { font-size: 1.6em; font-weight: 700; color: #0d1f2d; }
+
+  .card { background: #f0f6fd; border: 1px solid #b8d9f5; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card.red-accent { border-left: 4px solid #e63946; background: #fff2f3; }
+  .card.blue-accent { border-left: 4px solid #00b4d8; }
+  .card.green-accent { border-left: 4px solid #40916c; background: #eef8f2; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width:600px){ .two-col{grid-template-columns:1fr;} }
+
+  .tag-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1e3a52; margin-bottom: 8px; }
+  .tag-label.red { color: #b91c1c; }
+  .tag-label.green { color: #166534; }
+  ul.check-list { list-style: none; }
+  ul.check-list li { padding: 6px 0; padding-left: 24px; position: relative; font-size: 14px; color: #0d1f2d; line-height: 1.5; }
+  ul.check-list li::before { content: '✦'; position: absolute; left: 0; color: #0077b6; font-size: 12px; top: 8px; }
+
+  /* Scenario slide */
+  .scenario-number { font-size: 12px; color: #1e3a52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; }
+  .scenario-question { font-size: 1.2em; color: #0d1f2d; font-weight: 700; margin-bottom: 20px; line-height: 1.5; }
+
+  .email-box { background: #f9fafc; color: #0d1f2d; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 2px solid #e63946; }
+  .email-header { background: #e4edf7; padding: 14px 18px; border-bottom: 1px solid #c0d4e8; }
+  .email-row { display: flex; gap: 10px; margin-bottom: 5px; font-size: 13px; }
+  .email-field { color: #1e3a52; font-weight: 700; width: 60px; flex-shrink: 0; }
+  .email-value { color: #0d1f2d; font-weight: 500; }
+  .email-value.suspicious { color: #b91c1c; font-weight: 700; }
+  .email-body { padding: 16px 18px; font-size: 13.5px; line-height: 1.8; color: #0d1f2d; background: #ffffff; }
+  .email-link { color: #0055a5; text-decoration: underline; font-weight: 700; }
+  .email-link.bad { color: #b91c1c; font-weight: 700; }
+
+  /* Quiz options */
+  .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .option-btn { background: #eef5fb; border: 2px solid #90c4e4; border-radius: 10px; padding: 14px 18px; text-align: left; cursor: pointer; color: #0d1f2d; font-size: 14px; font-family: inherit; transition: all 0.2s; line-height: 1.5; font-weight: 500; }
+  .option-btn:hover:not(:disabled) { border-color: #0077b6; background: #dceefb; transform: translateX(4px); }
+  .option-btn.correct { border-color: #166534; background: #dcfce7; color: #14532d; font-weight: 700; }
+  .option-btn.wrong { border-color: #b91c1c; background: #fee2e2; color: #7f1d1d; font-weight: 600; }
+  .option-btn:disabled { cursor: default; transform: none; }
+
+  /* Feedback box */
+  .feedback { border-radius: 10px; padding: 18px; margin-bottom: 20px; display: none; }
+  .feedback.correct { background: #dcfce7; border: 2px solid #166534; }
+  .feedback.wrong { background: #fee2e2; border: 2px solid #b91c1c; }
+  .feedback-icon { font-size: 24px; margin-bottom: 8px; }
+  .feedback-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feedback.correct .feedback-title { color: #14532d; }
+  .feedback.wrong .feedback-title { color: #7f1d1d; }
+  .feedback-text { font-size: 13px; color: #0d1f2d; line-height: 1.6; font-weight: 500; }
+
+  /* Score slide */
+  .score-slide { text-align: center; padding: 20px; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(#00b4d8 0deg, #0077b6 var(--score-deg), #c8dff0 var(--score-deg)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; position: relative; }
+  .score-inner { width: 110px; height: 110px; border-radius: 50%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #b8d9f5; }
+  .score-number { font-size: 2.2em; font-weight: 800; color: #004e89; }
+  .score-label { font-size: 11px; color: #1e3a52; font-weight: 700; }
+  .score-message { font-size: 1.3em; font-weight: 700; margin-bottom: 10px; color: #0d1f2d; }
+  .score-sub { font-size: 14px; color: #1e3a52; margin-bottom: 30px; font-weight: 500; }
+  .review-cards { text-align: left; }
+  .review-item { background: #f0f6fd; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; border-left: 4px solid; }
+  .review-item.pass { border-color: #166534; background: #dcfce7; }
+  .review-item.fail { border-color: #b91c1c; background: #fee2e2; }
+  .review-item-label { font-size: 11px; color: #1e3a52; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .review-item-text { font-size: 13px; color: #0d1f2d; font-weight: 500; }
+
+  /* Buttons */
+  .btn { border: none; border-radius: 8px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 2px solid #0077b6; color: #0055a5; font-weight: 700; }
+  .btn-outline:hover { border-color: #004e89; background: #dceefb; color: #004e89; }
+  .btn-group { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-group.center { justify-content: center; }
+
+  /* Tips slide */
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media(max-width:600px){ .tips-grid{grid-template-columns:1fr;} }
+  .tip-card { background: #f0f6fd; border-radius: 10px; padding: 18px; border: 1px solid #b8d9f5; border-top: 3px solid #0077b6; }
+  .tip-num { font-size: 28px; font-weight: 800; color: #90c4e4; margin-bottom: 6px; }
+  .tip-title { font-size: 13px; font-weight: 700; color: #004e89; margin-bottom: 6px; }
+  .tip-desc { font-size: 12px; color: #1e3a52; line-height: 1.5; font-weight: 500; }
+
+  .red-flag-tag { display: inline-block; background: #fee2e2; color: #7f1d1d; border: 1px solid #b91c1c; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; margin: 2px; }
+
+  /* Footer */
+  .site-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #e8f2fa; border-top: 2px solid #90c4e4; padding: 10px 24px; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 100; }
+  .site-footer span { font-size: 12px; color: #1e3a52; font-weight: 600; }
+  .site-footer strong { color: #004e89; font-size: 12px; font-weight: 700; }
+  .footer-divider { color: #90c4e4; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="top-bar-logo">🛡️ <span>Phishing Awareness Training</span></div>
+<!-- <div class="top-bar-title">Prepared by <strong style="color:white;font-weight:700;">Corepath IT Consulting</strong></div> -->
+</div> 
+<div id="app">
+  <div class="progress-label" id="progressLabel">Introduction</div>
+  <div class="progress-container"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div id="slides"></div>
+</div>
+
+<script>
+// ← ADD PASSWORD CODE HERE — between <script> and const slides
+(function(){
+  const pwd = prompt("Enter Password To Access The Training:");
+  if(pwd !== "Corepath2026"){
+    document.body.innerHTML = `
+      <div style="text-align:center; margin-top:150px; font-family:Arial;">
+        <h2 style="color:#e63946;">⛔ Access Denied</h2>
+        <p style="color:#1e3a52;">Contact your IT team for access.</p>
+      </div>`;
+  }
+})();
+const slides = [
+  // 0 - Title
+  { type: 'title' },
+  // 1 - What is Phishing
+  { type: 'info', tag: 'Foundations', title: 'What Is Phishing?', content: 'info1' },
+  // 2 - Tactics vs Indicators
+  { type: 'info', tag: 'Key Concepts', title: 'Tactics vs. Technical Indicators', content: 'info2' },
+  // 3 - Scenario 1
+  { type: 'quiz', scenarioNum: 1, label: 'Scenario 1 of 4 — IT Department Password Reset' },
+  // 4 - Scenario 2
+  { type: 'quiz', scenarioNum: 2, label: 'Scenario 2 of 4 — Courier Delivery Notification' },
+  // 5 - Scenario 3
+  { type: 'quiz', scenarioNum: 3, label: 'Scenario 3 of 4 — Executive Finance Request' },
+  // 6 - Scenario 4
+  { type: 'quiz', scenarioNum: 4, label: 'Scenario 4 of 4 — Cloud Storage Alert' },
+  // 7 - Tips
+  { type: 'info', tag: 'Best Practices', title: '5 Golden Rules to Stay Safe', content: 'tips' },
+  // 8 - What To Do
+  { type: 'info', tag: 'Action Plan', title: 'When You Spot Phishing — What To Do', content: 'whattodo' },
+  // 9 - Quick Reference Checklist
+  { type: 'info', tag: 'Quick Reference', title: 'Phishing Detection Checklist', content: 'checklist' },
+  // 10 - Score
+  { type: 'score' }
+];
+
+const scenarios = [
+  {
+    from: { label: "'IT Helpdesk' support@ithelp-techcorp.net", suspicious: true },
+    subject: "Action Required: Reset Your Corporate Password Now",
+    date: "Monday, 17 March 2025, 9:04 AM",
+    body: `Dear Employee,<br><br>Our system has flagged your corporate account for a mandatory password reset due to a recent security audit. Failure to reset your password within 24 hours will result in your account being suspended.<br><br>Please click the link below to complete the reset immediately:<br><br><span class="email-link">[ RESET MY PASSWORD NOW ]</span><br><br>If you did not initiate this request, please disregard this email.<br><br>IT Support Team`,
+    question: "Which element is the most suspicious and definitive technical indicator of a phishing attempt?",
+    options: [
+      "The 24-hour deadline to reset the password.",
+      "The sender email address: 'support@ithelp-techcorp.net'",
+      "The threat of account suspension.",
+      "The generic greeting 'Dear Employee'."
+    ],
+    correct: 1,
+    explanation: "Your company's IT helpdesk sends email from your organisation's official domain (e.g., @techcorp.com). The domain 'ithelp-techcorp.net' is a look-alike domain — it mimics the company name but is hosted on a completely different, attacker-controlled domain. This is a definitive technical indicator that no legitimate IT department would use.",
+    redFlags: ["Look-alike domain", "Urgency / threat", "Generic greeting"]
+  },
+  {
+    from: { label: "'FastDeliver Courier' tracking@fastdeliver-parcel.info", suspicious: true },
+    subject: "Urgant! Your Parcell Could Not Be Deliverd - Reschdule Now",
+    date: "Tuesday, 18 March 2025, 2:47 PM",
+    body: `Dear Valued Custommer,<br><br>We atttempted to deliver you're parcel today but were unable to compleat the delivary. To reschedule, you must confirm you're delivery adress by clciking the link bellow:<br><br><span class="email-link bad">REESCHEDULE DELIVERY (http://fastparcel-redelivery.ru/confirm)</span><br><br>Pleese act within 48 hours or your parcel will be returned.<br><br>FastDeliver Custommer Services`,
+    question: "Which of the following best describes the red flags indicating this is a phishing attempt?",
+    options: [
+      "The 48-hour deadline to reschedule.",
+      "The generic greeting 'Valued Custommer'.",
+      "Widespread typos, misspellings, and grammatically incorrect content throughout the email.",
+      "The mention of a delivery you were not expecting."
+    ],
+    correct: 2,
+    explanation: "Legitimate courier companies use professional communication that is error-free. The sheer volume of spelling errors (e.g., 'Urgant', 'Parcell', 'Custommer', 'clciking') throughout this email is a strong indicator. Combined with a suspicious .ru country-code domain in the link and a look-alike sender domain, there are multiple overlapping red flags confirming phishing.",
+    redFlags: ["Mass misspellings", "Suspicious .ru domain", "Fake sender domain", "Urgency"]
+  },
+  {
+    from: { label: "'Sachin Dhole, MD' sachin.dhole.director@gmail.com", suspicious: true },
+    subject: "Confidential: Urgent Wire Transfer Needed",
+    date: "Wednesday, 19 March 2025, 11:23 AM",
+    body: `Hi,<br><br>I am currently in a board meeting and cannot take calls. I need you to process a confidential wire transfer of INR 4,80,000 to a vendor account urgently. This must be done before end of business today.<br><br>Please <strong>do not discuss this with anyone else</strong> in the office — the deal is sensitive. I will explain everything when I am back.<br><br>Send me the transfer confirmation once done.<br><br>Regards,<br>Sachin Dhole<br>Managing Director`,
+    question: "What is the most likely phishing tactic being used in this email?",
+    options: [
+      "The email is too brief and informal for a Managing Director.",
+      "The instruction to complete the transfer before end of business.",
+      "Impersonating a senior executive to request an urgent, secretive financial transfer — a classic Business Email Compromise (BEC) attack.",
+      "The word 'Confidential' in the subject line."
+    ],
+    correct: 2,
+    explanation: "This is a Business Email Compromise (BEC) attack. The attacker impersonates a senior executive using a free Gmail address (not the company domain) to pressure an employee into making a financial transfer. Key tactics: impersonation of authority, urgency, deliberate secrecy ('do not discuss'), and unavailability ('in a board meeting'). Always verify financial requests through a separate channel.",
+    redFlags: ["Free email domain (gmail)", "Impersonation", "Secrecy instruction", "Urgency", "Unusual payment request"]
+  },
+  {
+    from: { label: "'CloudStore Security' security-noreply@cloudstore.com", suspicious: false },
+    subject: "Security Alert: Sign-in from unrecognised device detected",
+    date: "Thursday, 20 March 2025, 8:15 AM",
+    body: `Hi Priya,<br><br>We noticed a sign-in to your CloudStore account from a device we don't recognise.<br><br>Location: Lagos, Nigeria<br>Time: 07:52 AM IST<br><br>If this was you, no action is needed. If you do not recognise this activity, please verify your account immediately:<br><br><a class="email-link" href="http://secure-login.info/cloudstore/account/verify" onclick="return false;" title="http://secure-login.info/cloudstore/account/verify" style="display:inline-block;background:#0055a5;color:#ffffff;padding:10px 22px;border-radius:6px;text-decoration:none;font-weight:700;font-size:13px;cursor:pointer;">Verify My Account</a><br><br><span style="font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:4px 10px;display:inline-block;margin-top:4px;">💡 Hover over the button above to see where it actually goes</span><br><br>The CloudStore Security Team`,
+    question: "You hovered over the 'Verify My Account' button and saw its destination URL. Which of the following link addresses did you see — and which is a definitive sign of a phishing attempt?",
+    options: [
+      "https://cloudstore.com/security/verify-device",
+      "https://accounts.cloudstore.com/login-alert",
+      "http://cloudstore-accounts.net/user/verify",
+      "http://secure-login.info/cloudstore/account/verify"
+    ],
+    correct: 3,
+    explanation: "The real domain always appears immediately before the first single forward-slash. In 'http://secure-login.info/cloudstore/account/verify', the actual domain is 'secure-login.info' — not cloudstore.com. The '/cloudstore/' part is just a folder path on the attacker's server, designed to deceive. Any link where the company name does not appear as the primary domain is a definitive technical indicator of phishing.",
+    redFlags: ["Fake primary domain", "Company name used as subfolder path", "No HTTPS"]
+  }
+];
+
+let currentSlide = 0;
+let answers = [null, null, null, null];
+let quizSlideMap = { 3: 0, 4: 1, 5: 2, 6: 3 };
+
+function renderSlide(index) {
+  const container = document.getElementById('slides');
+  const slide = slides[index];
+  let html = '';
+
+  if (slide.type === 'title') {
+    html = `<div class="slide active title-slide">
+      <div class="shield-icon">🛡️</div>
+      <h1>Phishing Awareness Training</h1>
+      <div class="subtitle">Recognise it. Report it. Stay Safe.</div>
+      <div class="module-pills">
+        <span class="pill">📖 Foundations</span>
+        <span class="pill">🎯 4 Live Scenarios</span>
+        <span class="pill">✅ Best Practices</span>
+        <span class="pill">🏆 Score & Review</span>
+      </div>
+      <div class="prepared-by-title">A Cybersecurity Awareness Programme by <strong>Corepath IT Consulting</strong></div>
+      <p style="color:#1e3a52;font-size:13px;margin-bottom:30px;">This interactive training takes approximately <strong style="color:#004e89">10–15 minutes</strong>. Work through each scenario and test your ability to spot phishing attacks before they fool you.</p>
+      <div class="btn-group center">
+        <button class="btn btn-primary" onclick="nextSlide()">Start Training →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info1') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">Phishing is the most common cybersecurity attack facing organisations today. Attackers craft deceptive emails to trick employees into revealing sensitive information, transferring money, or clicking malicious links.</p>
+        <div class="two-col">
+          <div class="card red-accent">
+            <div class="tag-label red">🎭 The Attacker's Goal</div>
+            <ul class="check-list">
+              <li>Steal login credentials</li>
+              <li>Initiate fraudulent payments</li>
+              <li>Install malware or ransomware</li>
+              <li>Access sensitive company data</li>
+            </ul>
+          </div>
+          <div class="card blue-accent">
+            <div class="tag-label" style="color:#004e89">⚡ Why It Works</div>
+            <ul class="check-list">
+              <li>Exploits human psychology</li>
+              <li>Creates urgency and fear</li>
+              <li>Mimics trusted brands</li>
+              <li>Easy to send at massive scale</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="background:#eef5fb;text-align:center;padding:20px;border:1px solid #b8d9f5;">
+          <div style="font-size:2em;margin-bottom:8px;">📊</div>
+          <div style="font-size:22px;font-weight:800;color:#004e89;margin-bottom:4px;">91%</div>
+          <div style="font-size:13px;color:#0d1f2d;font-weight:600;">of cyberattacks begin with a phishing email</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info2') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">When evaluating a suspicious email, you need to distinguish between psychological tricks and verifiable technical evidence.</p>
+        <div class="two-col">
+          <div class="card" style="border-top:3px solid #e63946;background:#fff2f3;border:1px solid #f5c6cb;border-top:3px solid #e63946;">
+            <div class="tag-label red" style="margin-bottom:10px;">🎭 PHISHING TACTICS<br><span style="color:#1e3a52;font-weight:600;font-size:10px;">Psychological manipulation</span></div>
+            <ul class="check-list">
+              <li><strong>Urgency:</strong> "Act within 24 hours!"</li>
+              <li><strong>Fear:</strong> "Your account has been locked"</li>
+              <li><strong>Authority:</strong> Pretending to be your CEO or Manager </li>
+              <li><strong>Secrecy:</strong> "Don't tell anyone about this"</li>
+              <li><strong>Greed:</strong> "You've won a free prize!"</li>
+            </ul>
+          </div>
+          <div class="card" style="border:1px solid #d4e6f5;border-top:3px solid #00b4d8;background:#f4f8fc;">
+            <div class="tag-label" style="color:#004e89;margin-bottom:10px;">🔍 TECHNICAL INDICATORS<br><span style="color:#1e3a52;font-weight:600;font-size:10px;">Verifiable, definitive proof</span></div>
+            <ul class="check-list">
+              <li><strong>Fake sender domain</strong> (e.g., bank-support.co vs bank.com)</li>
+              <li><strong>Malicious link URL</strong> where the real domain differs from visible text</li>
+              <li><strong>Free email provider</strong> used for corporate communication</li>
+              <li><strong>Suspicious country-code domains</strong> (.ru, .cn, .info)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card green-accent" style="padding:16px 20px;">
+          <div class="tag-label green">💡 PRO TIP — Focus on Technical Indicators</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Tactics alone are not definitive proof. A legitimate email can be urgent. But a mismatched domain or malicious link URL is always a definitive technical indicator of phishing, regardless of the message tone.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Start Scenarios →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'quiz') {
+    const qIdx = quizSlideMap[index];
+    const sc = scenarios[qIdx];
+    const fromClass = sc.from.suspicious ? 'suspicious' : '';
+    const answered = answers[qIdx] !== null;
+
+    const optionsHtml = sc.options.map((opt, i) => {
+      let cls = '';
+      if (answered) {
+        if (i === sc.correct) cls = 'correct';
+        else if (i === answers[qIdx]) cls = 'wrong';
+      }
+      return `<button class="option-btn ${cls}" ${answered ? 'disabled' : ''} onclick="selectAnswer(${qIdx}, ${i})">${String.fromCharCode(65+i)}. ${opt}</button>`;
+    }).join('');
+
+    const feedbackHtml = answered ? `
+      <div class="feedback ${answers[qIdx] === sc.correct ? 'correct' : 'wrong'}" style="display:block">
+        <div class="feedback-icon">${answers[qIdx] === sc.correct ? '✅' : '❌'}</div>
+        <div class="feedback-title">${answers[qIdx] === sc.correct ? 'Correct! Well spotted.' : 'Not quite — let\'s review.'}</div>
+        <div class="feedback-text">${sc.explanation}</div>
+        <div style="margin-top:10px;"><strong style="color:#1e3a52;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Red Flags in this email:</strong><br><div style="margin-top:6px;">${sc.redFlags.map(f => `<span class="red-flag-tag">${f}</span>`).join(' ')}</div></div>
+      </div>` : '';
+
+    html = `<div class="slide active">
+      <div class="scenario-number">${slide.label}</div>
+      <div class="scenario-question">${sc.question}</div>
+      <div class="email-box">
+        <div class="email-header">
+          <div class="email-row"><span class="email-field">From:</span><span class="email-value ${fromClass}">${sc.from.label}</span></div>
+          <div class="email-row"><span class="email-field">Subject:</span><span class="email-value">${sc.subject}</span></div>
+          <div class="email-row"><span class="email-field">Date:</span><span class="email-value">${sc.date}</span></div>
+        </div>
+        <div class="email-body">${sc.body}</div>
+      </div>
+      <div class="options-grid">${optionsHtml}</div>
+      ${feedbackHtml}
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        ${answered ? `<button class="btn btn-primary" onclick="nextSlide()">${index === 6 ? 'See Results →' : 'Next Scenario →'}</button>` : ''}
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'tips') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag tip">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div class="tips-grid" style="margin:20px 0;">
+        <div class="tip-card">
+          <div class="tip-num">01</div>
+          <div class="tip-title">Verify the Sender Domain</div>
+          <div class="tip-desc">Legitimate companies always use their own official domain. A free email provider (gmail, yahoo) or a look-alike domain is an instant red flag.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">02</div>
+          <div class="tip-title">Hover Before You Click</div>
+          <div class="tip-desc">Always hover over links to preview the real URL. The visible text and the actual destination are often different in phishing emails.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">03</div>
+          <div class="tip-title">Slow Down on Urgency</div>
+          <div class="tip-desc">Attackers use pressure and secrecy to prevent you thinking clearly. A real IT team or manager will never penalise you for pausing to verify.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">04</div>
+          <div class="tip-title">Verify Financial Requests Separately</div>
+          <div class="tip-desc">Any request for a transfer or gift card purchase must be verbally confirmed via phone or in person — never by replying to the same email.</div>
+        </div>
+        <div class="tip-card" style="grid-column: 1 / -1;">
+          <div class="tip-num">05</div>
+          <div class="tip-title">Report — Don't Delete</div>
+          <div class="tip-desc">Report suspected phishing to your IT Security team immediately. Do not delete the email — it may help protect your entire organisation. When in doubt, report it out.</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'whattodo') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag warning">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <div class="two-col">
+          <div class="card green-accent">
+            <div class="tag-label green" style="margin-bottom:12px;">✅ DO — Act on These</div>
+            <ul class="check-list">
+              <li>Report using the <strong>"Report Phishing"</strong> button in Outlook</li>
+              <li>Forward to <strong>security@yourcompany.com</strong></li>
+              <li>Verify unusual requests by calling the sender directly</li>
+              <li>Hover over every link before clicking to check the real URL</li>
+              <li>Check the full sender email address — not just the display name</li>
+              <li>Enable <strong>Multi-Factor Authentication (MFA)</strong> on all accounts</li>
+            </ul>
+          </div>
+          <div class="card red-accent">
+            <div class="tag-label red" style="margin-bottom:12px;">❌ DO NOT — Avoid These</div>
+            <ul class="check-list">
+              <li>Click links or open attachments in suspicious emails</li>
+              <li>Enter credentials or OTPs on any unfamiliar page</li>
+              <li>Wire money or purchase gift cards based on an email request</li>
+              <li>Share passwords, PINs, or OTPs via email with anyone</li>
+              <li>Ignore a suspicious email — always report it</li>
+              <li>Assume a professional-looking email is automatically safe</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card blue-accent" style="padding:16px 20px;">
+          <div class="tag-label" style="color:#004e89;">📞 GOLDEN RULE — When In Doubt</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Pick up the phone. Call using a number you already know — never a number provided in the suspicious email itself. A real IT team or manager will never mind you pausing to verify.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'checklist') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:16px;font-weight:500;">Before acting on any email, run through this checklist. Always start with <span style="color:#b91c1c;font-weight:700;">CRITICAL</span> checks — they are definitive, unforgeable technical proof of phishing.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;padding:8px 14px;border-radius:8px;background:linear-gradient(135deg,#0077b6,#00b4d8);">
+            <span style="color:white;font-weight:800;font-size:12px;">#</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Check</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;text-align:center;">Priority</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">1</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is the sender domain exactly correct? (e.g., @techcorp.com — not @techcorp-support.net)</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">CRITICAL</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">2</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Does the hover URL match the expected company domain?</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">CRITICAL</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">3</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Were you expecting this email or attachment?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">4</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is there unusual urgency, fear, or pressure to act immediately?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">5</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is it requesting credentials, OTPs, financial data, or gift cards?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">6</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Are there spelling mistakes, grammar errors, or unusual formatting?</span>
+            <span style="text-align:center;background:#eef5fb;color:#004e89;border:1px solid #90c4e4;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MEDIUM</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">7</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is the greeting generic ("Dear Customer") rather than your actual name?</span>
+            <span style="text-align:center;background:#eef5fb;color:#004e89;border:1px solid #90c4e4;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MEDIUM</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">8</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Does the email have unexpected attachments (.zip / .exe / .docm)?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">See My Score →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'score') {
+    const score = answers.filter((a, i) => a === scenarios[i].correct).length;
+    const pct = Math.round((score / 4) * 100);
+    const deg = Math.round((pct / 100) * 360);
+    let msg, sub;
+    if (score === 4) { msg = "Outstanding! 🏆"; sub = "You correctly identified all four phishing attempts. You're a valuable line of defence for your organisation."; }
+    else if (score === 3) { msg = "Great Work! 👍"; sub = "You identified 3 out of 4 phishing attempts. Review the scenario you missed to sharpen your skills."; }
+    else if (score === 2) { msg = "Good Effort 🎯"; sub = "You identified 2 out of 4 phishing attempts. Review the explanations carefully and consider retaking the training."; }
+    else { msg = "Keep Practising 📚"; sub = "Review the explanations for each scenario and retake this training to build your phishing awareness skills."; }
+
+    const reviewItems = scenarios.map((sc, i) => {
+      const pass = answers[i] === sc.correct;
+      return `<div class="review-item ${pass ? 'pass' : 'fail'}">
+        <div class="review-item-label">Scenario ${i+1} — ${pass ? '✅ Correct' : '❌ Missed'}</div>
+        <div class="review-item-text">${pass ? 'Great — you spotted the key indicator.' : `Correct answer: ${sc.options[sc.correct]}`}</div>
+      </div>`;
+    }).join('');
+
+    html = `<div class="slide active score-slide">
+      <h2 style="color:#0d1f2d;margin-bottom:20px;">Training Complete!</h2>
+      <div class="score-circle" style="--score-deg:${deg}deg">
+        <div class="score-inner">
+          <span class="score-number">${score}/4</span>
+          <span class="score-label">${pct}%</span>
+        </div>
+      </div>
+      <div class="score-message">${msg}</div>
+      <div class="score-sub">${sub}</div>
+      <div class="review-cards">${reviewItems}</div>
+      <div class="btn-group center" style="margin-top:24px;">
+        <button class="btn btn-outline" onclick="restartTraining()">🔄 Retake Training</button>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (currentSlide / (slides.length - 1)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  const labels = ['Introduction','What Is Phishing?','Tactics vs Indicators','Scenario 1','Scenario 2','Scenario 3','Scenario 4','Golden Rules','What To Do','Quick Reference','Your Results'];
+  document.getElementById('progressLabel').textContent = labels[currentSlide] || '';
+}
+
+function nextSlide() {
+  if (currentSlide < slides.length - 1) { currentSlide++; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+function prevSlide() {
+  if (currentSlide > 0) { currentSlide--; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+
+function selectAnswer(qIdx, optionIdx) {
+  answers[qIdx] = optionIdx;
+  renderSlide(currentSlide);
+}
+
+function restartTraining() {
+  answers = [null, null, null, null];
+  currentSlide = 0;
+  renderSlide(0);
+  window.scrollTo(0,0);
+}
+
+renderSlide(0);
+</script>
+<footer class="site-footer">
+  <span>🔒 Training prepared by</span>
+  <strong>Corepath IT Consulting</strong>
+  <span class="footer-divider">·</span>
+  <span>Cybersecurity Awareness Programme</span>
+  <span class="footer-divider">·</span>
+  <span>Confidential — Internal Use Only</span>
+</footer>
+</body>
+</html>
