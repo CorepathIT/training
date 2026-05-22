@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Awareness Training — Series 2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1a2a3a; min-height: 100vh; }
+
+  .top-bar { background: linear-gradient(135deg, #0077b6, #00b4d8); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar-logo { color: white; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .top-bar-logo span { opacity: 0.85; font-weight: 400; }
+  .top-bar-title { color: rgba(255,255,255,0.75); font-size: 12px; }
+
+  #app { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .progress-container { background: #e8f0f8; border-radius: 20px; height: 8px; margin-bottom: 24px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #0077b6, #00b4d8); border-radius: 20px; transition: width 0.6s ease; }
+  .progress-label { text-align: right; font-size: 12px; color: #334e68; margin-bottom: 6px; font-weight: 600; }
+
+  .slide { display: none; animation: fadeIn 0.5s ease; }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .title-slide { text-align: center; padding: 40px 20px; }
+  .shield-icon { font-size: 72px; margin-bottom: 20px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+  .title-slide h1 { font-size: 2.4em; font-weight: 800; background: linear-gradient(90deg, #0077b6, #00b4d8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .title-slide .subtitle { color: #1e3a52; font-size: 1.1em; margin-bottom: 30px; font-weight: 500; }
+  .module-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .pill { background: #dceefb; border: 1px solid #90c4e4; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #004e89; font-weight: 700; }
+  .prepared-by-title { font-size: 13px; color: #1e3a52; margin-bottom: 32px; letter-spacing: 0.3px; font-weight: 500; }
+  .prepared-by-title strong { color: #0077b6; }
+
+  .info-slide { }
+  .slide-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .slide-tag { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .slide-tag.warning { background: linear-gradient(135deg, #e63946, #c1121f); }
+  .slide-tag.tip { background: linear-gradient(135deg, #2d6a4f, #40916c); }
+  .slide-title { font-size: 1.6em; font-weight: 700; color: #0d1f2d; }
+
+  .card { background: #f0f6fd; border: 1px solid #b8d9f5; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card.red-accent { border-left: 4px solid #e63946; background: #fff2f3; }
+  .card.blue-accent { border-left: 4px solid #00b4d8; }
+  .card.green-accent { border-left: 4px solid #40916c; background: #eef8f2; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width:600px){ .two-col{grid-template-columns:1fr;} }
+
+  .tag-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1e3a52; margin-bottom: 8px; }
+  .tag-label.red { color: #b91c1c; }
+  .tag-label.green { color: #166534; }
+  ul.check-list { list-style: none; }
+  ul.check-list li { padding: 6px 0; padding-left: 24px; position: relative; font-size: 14px; color: #0d1f2d; line-height: 1.5; }
+  ul.check-list li::before { content: '✦'; position: absolute; left: 0; color: #0077b6; font-size: 12px; top: 8px; }
+
+  .scenario-number { font-size: 12px; color: #1e3a52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; }
+  .scenario-question { font-size: 1.2em; color: #0d1f2d; font-weight: 700; margin-bottom: 20px; line-height: 1.5; }
+
+  .email-box { background: #f9fafc; color: #0d1f2d; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 2px solid #e63946; }
+  .email-header { background: #e4edf7; padding: 14px 18px; border-bottom: 1px solid #c0d4e8; }
+  .email-row { display: flex; gap: 10px; margin-bottom: 5px; font-size: 13px; }
+  .email-field { color: #1e3a52; font-weight: 700; width: 60px; flex-shrink: 0; }
+  .email-value { color: #0d1f2d; font-weight: 500; }
+  .email-value.suspicious { color: #b91c1c; font-weight: 700; }
+  .email-body { padding: 16px 18px; font-size: 13.5px; line-height: 1.8; color: #0d1f2d; background: #ffffff; }
+  .email-link { color: #0055a5; text-decoration: underline; font-weight: 700; }
+  .email-link.bad { color: #b91c1c; font-weight: 700; }
+
+  /* SMS box style */
+  .sms-box { background: #f9fafc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 2px solid #e63946; }
+  .sms-header { background: #e4edf7; padding: 10px 18px; border-bottom: 1px solid #c0d4e8; display: flex; align-items: center; gap: 10px; }
+  .sms-header-label { font-size: 12px; font-weight: 700; color: #1e3a52; text-transform: uppercase; letter-spacing: 1px; }
+  .sms-from { font-size: 13px; font-weight: 700; color: #b91c1c; }
+  .sms-body { padding: 16px 18px; font-size: 13.5px; line-height: 1.8; color: #0d1f2d; background: #ffffff; }
+  .sms-bubble { background: #e4edf7; border-radius: 16px 16px 16px 4px; padding: 12px 16px; display: inline-block; max-width: 85%; font-size: 13.5px; line-height: 1.7; color: #0d1f2d; }
+
+  .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .option-btn { background: #eef5fb; border: 2px solid #90c4e4; border-radius: 10px; padding: 14px 18px; text-align: left; cursor: pointer; color: #0d1f2d; font-size: 14px; font-family: inherit; transition: all 0.2s; line-height: 1.5; font-weight: 500; }
+  .option-btn:hover:not(:disabled) { border-color: #0077b6; background: #dceefb; transform: translateX(4px); }
+  .option-btn.correct { border-color: #166534; background: #dcfce7; color: #14532d; font-weight: 700; }
+  .option-btn.wrong { border-color: #b91c1c; background: #fee2e2; color: #7f1d1d; font-weight: 600; }
+  .option-btn:disabled { cursor: default; transform: none; }
+
+  .feedback { border-radius: 10px; padding: 18px; margin-bottom: 20px; display: none; }
+  .feedback.correct { background: #dcfce7; border: 2px solid #166534; }
+  .feedback.wrong { background: #fee2e2; border: 2px solid #b91c1c; }
+  .feedback-icon { font-size: 24px; margin-bottom: 8px; }
+  .feedback-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feedback.correct .feedback-title { color: #14532d; }
+  .feedback.wrong .feedback-title { color: #7f1d1d; }
+  .feedback-text { font-size: 13px; color: #0d1f2d; line-height: 1.6; font-weight: 500; }
+
+  .score-slide { text-align: center; padding: 20px; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(#00b4d8 0deg, #0077b6 var(--score-deg), #c8dff0 var(--score-deg)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; position: relative; }
+  .score-inner { width: 110px; height: 110px; border-radius: 50%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #b8d9f5; }
+  .score-number { font-size: 2.2em; font-weight: 800; color: #004e89; }
+  .score-label { font-size: 11px; color: #1e3a52; font-weight: 700; }
+  .score-message { font-size: 1.3em; font-weight: 700; margin-bottom: 10px; color: #0d1f2d; }
+  .score-sub { font-size: 14px; color: #1e3a52; margin-bottom: 30px; font-weight: 500; }
+  .review-cards { text-align: left; }
+  .review-item { background: #f0f6fd; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; border-left: 4px solid; }
+  .review-item.pass { border-color: #166534; background: #dcfce7; }
+  .review-item.fail { border-color: #b91c1c; background: #fee2e2; }
+  .review-item-label { font-size: 11px; color: #1e3a52; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .review-item-text { font-size: 13px; color: #0d1f2d; font-weight: 500; }
+
+  .btn { border: none; border-radius: 8px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 2px solid #0077b6; color: #0055a5; font-weight: 700; }
+  .btn-outline:hover { border-color: #004e89; background: #dceefb; color: #004e89; }
+  .btn-group { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-group.center { justify-content: center; }
+
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media(max-width:600px){ .tips-grid{grid-template-columns:1fr;} }
+  .tip-card { background: #f0f6fd; border-radius: 10px; padding: 18px; border: 1px solid #b8d9f5; border-top: 3px solid #0077b6; }
+  .tip-num { font-size: 28px; font-weight: 800; color: #90c4e4; margin-bottom: 6px; }
+  .tip-title { font-size: 13px; font-weight: 700; color: #004e89; margin-bottom: 6px; }
+  .tip-desc { font-size: 12px; color: #1e3a52; line-height: 1.5; font-weight: 500; }
+
+  .red-flag-tag { display: inline-block; background: #fee2e2; color: #7f1d1d; border: 1px solid #b91c1c; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; margin: 2px; }
+
+  .site-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #e8f2fa; border-top: 2px solid #90c4e4; padding: 10px 24px; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 100; }
+  .site-footer span { font-size: 12px; color: #1e3a52; font-weight: 600; }
+  .site-footer strong { color: #004e89; font-size: 12px; font-weight: 700; }
+  .footer-divider { color: #90c4e4; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="top-bar-logo">🛡️ <span>Phishing Awareness Training — Series 2</span></div>
+</div>
+<div id="app">
+  <div class="progress-label" id="progressLabel">Introduction</div>
+  <div class="progress-container"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div id="slides"></div>
+</div>
+
+<script>
+(function(){
+  const pwd = prompt("Enter Password To Access The Training:");
+  if(pwd !== "Corepath2026"){
+    document.body.innerHTML = `
+      <div style="text-align:center; margin-top:150px; font-family:Arial;">
+        <h2 style="color:#e63946;">⛔ Access Denied</h2>
+        <p style="color:#1e3a52;">Contact your IT team for access.</p>
+      </div>`;
+  }
+})();
+
+const slides = [
+  { type: 'title' },
+  { type: 'info', tag: 'Series 2 Focus', title: 'Beyond Email — Smishing & Vishing Attacks', content: 'info1' },
+  { type: 'info', tag: 'Key Concepts', title: 'Smishing vs Vishing vs Phishing', content: 'info2' },
+  { type: 'quiz', scenarioNum: 1, label: 'Scenario 1 of 4 — WhatsApp HR Message' },
+  { type: 'quiz', scenarioNum: 2, label: 'Scenario 2 of 4 — Vendor Invoice SMS' },
+  { type: 'quiz', scenarioNum: 3, label: 'Scenario 3 of 4 — Fake Bank OTP Call' },
+  { type: 'quiz', scenarioNum: 4, label: 'Scenario 4 of 4 — IT Support Phone Call' },
+  { type: 'info', tag: 'Best Practices', title: '5 Golden Rules for Smishing & Vishing', content: 'tips' },
+  { type: 'info', tag: 'Action Plan', title: 'When You Spot Smishing or Vishing — What To Do', content: 'whattodo' },
+  { type: 'info', tag: 'Quick Reference', title: 'Smishing & Vishing Detection Checklist', content: 'checklist' },
+  { type: 'score' }
+];
+
+const scenarios = [
+  {
+    type: 'sms',
+    from: { label: 'Unknown Number: +91-98203-XXXXX (Saved as "HR Bonton")', suspicious: true },
+    subject: 'WhatsApp Message',
+    date: 'Monday, 7 April 2026, 10:12 AM',
+    body: `Hi, this is Rekha from HR. We are processing this month's salary revisions and need you to urgently confirm your updated bank account details via this secure form by 3 PM today:<br><br><span class="email-link bad">http://bonton-hr-update.page.link/salary</span><br><br>This is mandatory. Employees who do not submit will have salary processing delayed. Please do not share this link with anyone.`,
+    question: "You receive this WhatsApp message from a number saved as 'HR Bonton'. What is the most definitive red flag?",
+    options: [
+      "The 3 PM deadline creates pressure to act quickly.",
+      "HR would never ask for bank details — this should always be done through official HR portals or in person with verification.",
+      "The instruction not to share the link with anyone.",
+      "The message came via WhatsApp instead of email."
+    ],
+    correct: 1,
+    explanation: "Legitimate HR departments at Bonton Furniture never request bank account updates via WhatsApp links. Any change to salary or bank details must go through the official HR portal or be submitted in person with ID verification. The link uses a URL shortener (page.link) to disguise the real destination — a classic smishing technique. The secrecy instruction and tight deadline are additional psychological pressure tactics.",
+    redFlags: ["Unofficial channel (WhatsApp)", "URL shortener hides destination", "Requests sensitive financial data", "Secrecy instruction", "Urgency / deadline"]
+  },
+  {
+    type: 'sms',
+    from: { label: 'SMS from: VM-BONTON (Sender ID spoofed)', suspicious: true },
+    subject: 'SMS Message',
+    date: 'Tuesday, 8 April 2026, 3:55 PM',
+    body: `BONTON ALERT: Your vendor payment of INR 2,14,500 to Mehta Traders is on hold. Our banking partner requires you to re-verify the beneficiary account. Tap here within 1 hour to avoid cancellation:<br><br><span class="email-link bad">http://bnk-verify.in/bonton/vendor/02984</span><br><br>— Bonton Finance Team`,
+    question: "This SMS appears to come from 'VM-BONTON' — a sender ID that looks official. What is the most reliable way to determine this is a smishing attempt?",
+    options: [
+      "The 1-hour deadline to act.",
+      "Bonton Finance would never communicate payment holds via SMS — and the link domain 'bnk-verify.in' is not a Bonton Furniture domain.",
+      "The SMS mentions a specific vendor name and amount, which seems too detailed.",
+      "Official SMS sender IDs always use the full company name."
+    ],
+    correct: 1,
+    explanation: "Sender IDs like 'VM-BONTON' can be trivially spoofed by attackers — this is not a reliable indicator of authenticity. The definitive red flag is the link domain: 'bnk-verify.in' has no connection to bontonfurniture.net. Bonton's Finance team communicates payment issues through official email or internal ERP systems — never via SMS links. Always verify payment-related alerts by calling the Finance team directly using a number from the internal directory.",
+    redFlags: ["Spoofed sender ID", "Unrelated link domain", "Finance alert via SMS", "Urgency (1-hour)"]
+  },
+  {
+    type: 'call',
+    from: { label: 'Incoming Call — +91-022-XXXX-4491 (Caller claims to be HDFC Bank Fraud Team)', suspicious: true },
+    subject: 'Phone Call',
+    date: 'Wednesday, 9 April 2026, 12:30 PM',
+    body: `"Good afternoon, I am calling from HDFC Bank Fraud Prevention. We have detected an unauthorised transaction of INR 48,000 on the Bonton Furniture corporate account ending 7712. To immediately block this transaction, I need you to confirm the OTP that will be sent to your registered mobile number right now. Please do not hang up — every second counts."`,
+    question: "A caller claiming to be from HDFC Bank's fraud team asks you to share an OTP to block a transaction. What should you do?",
+    options: [
+      "Share the OTP immediately — stopping a fraudulent transaction is urgent.",
+      "Ask the caller to repeat the transaction details before sharing the OTP.",
+      "Hang up immediately. A genuine bank will NEVER ask you to share an OTP over the phone — sharing it hands account access directly to the attacker.",
+      "Ask the caller for their employee ID before sharing the OTP."
+    ],
+    correct: 2,
+    explanation: "This is a vishing (voice phishing) attack. The golden rule of banking: no legitimate bank, ever, under any circumstance, will ask you to share an OTP over the phone. The OTP is specifically designed to be entered only by you on a secure banking page. Sharing it verbally gives the attacker full control to authorise a transaction. The urgency ('every second counts', 'do not hang up') is a deliberate tactic to prevent you from thinking clearly. Hang up and call HDFC Bank's official number to verify.",
+    redFlags: ["Requests OTP over phone", "High urgency / 'do not hang up'", "Unsolicited inbound call", "Impersonating bank fraud team"]
+  },
+  {
+    type: 'call',
+    from: { label: 'Incoming Call — Claims to be Rajan from Corepath IT Helpdesk', suspicious: true },
+    subject: 'Phone Call',
+    date: 'Thursday, 10 April 2026, 9:45 AM',
+    body: `"Hi, this is Rajan calling from the Corepath IT Helpdesk. We have detected unusual login activity on your Bonton employee account from an overseas IP address. To secure your account immediately, I need you to stay on the line while I walk you through a remote access session. Please download AnyDesk from the link I'm sending to your phone now and share the access code with me."`,
+    question: "The caller asks you to install AnyDesk and share the remote access code. What is the correct response?",
+    options: [
+      "Install AnyDesk and share the code — the IT team needs access to fix the issue.",
+      "Ask the caller to send an official email first before proceeding.",
+      "Decline immediately. Legitimate IT support never cold-calls and asks you to install remote access software or share access codes. This is a vishing attack designed to take control of your device.",
+      "Share only a temporary access code — not your permanent password."
+    ],
+    correct: 2,
+    explanation: "This is a vishing attack combined with a remote access scam. Once you share an AnyDesk (or TeamViewer/AnyDesk) access code, the attacker has full visual and operational control of your device — including access to files, passwords saved in your browser, banking portals, and the ability to install malware. The Corepath IT Helpdesk raises support tickets through official channels and would never cold-call you asking to install software. If in doubt, hang up and call the IT Helpdesk back using the number in the official company directory.",
+    redFlags: ["Unsolicited call requesting remote access", "Asks to install software", "Request to share access code", "Urgency about overseas login", "Impersonation of IT support"]
+  }
+];
+
+let currentSlide = 0;
+let answers = [null, null, null, null];
+let quizSlideMap = { 3: 0, 4: 1, 5: 2, 6: 3 };
+
+function renderSlide(index) {
+  const container = document.getElementById('slides');
+  const slide = slides[index];
+  let html = '';
+
+  if (slide.type === 'title') {
+    html = `<div class="slide active title-slide">
+      <div class="shield-icon">🛡️</div>
+      <h1>Phishing Awareness Training</h1>
+      <div class="subtitle">Series 2 — Smishing, Vishing & Phone-Based Attacks</div>
+      <div class="module-pills">
+        <span class="pill">📱 Smishing & Vishing</span>
+        <span class="pill">🎯 4 Live Scenarios</span>
+        <span class="pill">✅ Best Practices</span>
+        <span class="pill">🏆 Score & Review</span>
+      </div>
+      <div class="prepared-by-title">A Cybersecurity Awareness Programme by <strong>Corepath IT Consulting</strong></div>
+      <p style="color:#1e3a52;font-size:13px;margin-bottom:30px;">This is <strong style="color:#004e89">Series 2</strong> of your ongoing Phishing Awareness Training. This module focuses on attacks delivered via <strong style="color:#004e89">SMS, WhatsApp, and phone calls</strong> — threats that bypass your email filters entirely. Approximately <strong style="color:#004e89">10–15 minutes</strong>.</p>
+      <div class="btn-group center">
+        <button class="btn btn-primary" onclick="nextSlide()">Start Training →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info1') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">In Series 1, we covered email phishing. But attackers have evolved — they now target employees through SMS, WhatsApp, and direct phone calls, channels that many people instinctively trust more than email.</p>
+        <div class="two-col">
+          <div class="card red-accent">
+            <div class="tag-label red">📱 Why SMS & Calls Work</div>
+            <ul class="check-list">
+              <li>Bypasses all email security filters</li>
+              <li>People are less suspicious of SMS than email</li>
+              <li>Phone calls add a human voice — harder to doubt</li>
+              <li>Sender IDs and caller IDs can be easily spoofed</li>
+            </ul>
+          </div>
+          <div class="card blue-accent">
+            <div class="tag-label" style="color:#004e89">⚡ What Attackers Want</div>
+            <ul class="check-list">
+              <li>OTPs to authorise fraudulent transactions</li>
+              <li>Remote access to your device</li>
+              <li>Bank account or salary details</li>
+              <li>Login credentials entered on fake sites</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="background:#eef5fb;text-align:center;padding:20px;border:1px solid #b8d9f5;">
+          <div style="font-size:2em;margin-bottom:8px;">📊</div>
+          <div style="font-size:22px;font-weight:800;color:#004e89;margin-bottom:4px;">74%</div>
+          <div style="font-size:13px;color:#0d1f2d;font-weight:600;">of organisations reported smishing or vishing attacks in 2024 — up from 55% in 2022</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info2') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">Phishing attacks now arrive through multiple channels. Knowing how each type works is the first step to defending against them.</p>
+        <div class="card red-accent" style="margin-bottom:12px;">
+          <div class="tag-label red">📧 PHISHING — Email-Based (Covered in Series 1)</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Deceptive emails impersonating trusted organisations to steal credentials, initiate payments, or deliver malware. Key indicator: fake sender domain.</p>
+        </div>
+        <div class="card blue-accent" style="margin-bottom:12px;">
+          <div class="tag-label" style="color:#004e89;">📱 SMISHING — SMS / WhatsApp-Based</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Fraudulent text messages that use spoofed sender IDs or WhatsApp accounts to impersonate HR, banks, or IT teams. Often contain shortened URLs that hide the real destination. Key indicator: link domain mismatch or request for sensitive data via message.</p>
+        </div>
+        <div class="card" style="border-left:4px solid #e63946;background:#fff2f3;border:1px solid #f5c6cb;border-left:4px solid #e63946;margin-bottom:12px;">
+          <div class="tag-label red">📞 VISHING — Voice / Phone Call-Based</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Attackers call employees pretending to be banks, IT support, or senior management. They create urgency to pressure victims into sharing OTPs, installing remote access tools, or transferring funds. Key indicator: unsolicited call requesting sensitive action.</p>
+        </div>
+        <div class="card green-accent" style="padding:16px 20px;">
+          <div class="tag-label green">💡 THE UNIVERSAL RULE</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Regardless of the channel — email, SMS, or phone — no legitimate organisation will ever ask you to share an OTP, password, or grant remote access under time pressure. Urgency is always a manipulation tactic.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Start Scenarios →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'quiz') {
+    const qIdx = quizSlideMap[index];
+    const sc = scenarios[qIdx];
+    const fromClass = sc.from.suspicious ? 'suspicious' : '';
+    const answered = answers[qIdx] !== null;
+
+    const optionsHtml = sc.options.map((opt, i) => {
+      let cls = '';
+      if (answered) {
+        if (i === sc.correct) cls = 'correct';
+        else if (i === answers[qIdx]) cls = 'wrong';
+      }
+      return `<button class="option-btn ${cls}" ${answered ? 'disabled' : ''} onclick="selectAnswer(${qIdx}, ${i})">${String.fromCharCode(65+i)}. ${opt}</button>`;
+    }).join('');
+
+    const feedbackHtml = answered ? `
+      <div class="feedback ${answers[qIdx] === sc.correct ? 'correct' : 'wrong'}" style="display:block">
+        <div class="feedback-icon">${answers[qIdx] === sc.correct ? '✅' : '❌'}</div>
+        <div class="feedback-title">${answers[qIdx] === sc.correct ? 'Correct! Well spotted.' : 'Not quite — let\'s review.'}</div>
+        <div class="feedback-text">${sc.explanation}</div>
+        <div style="margin-top:10px;"><strong style="color:#1e3a52;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Red Flags:</strong><br><div style="margin-top:6px;">${sc.redFlags.map(f => `<span class="red-flag-tag">${f}</span>`).join(' ')}</div></div>
+      </div>` : '';
+
+    // Render SMS/Call box differently
+    let messageBox = '';
+    if (sc.type === 'sms') {
+      messageBox = `<div class="sms-box">
+        <div class="sms-header">
+          <span style="font-size:20px;">📱</span>
+          <div>
+            <div class="sms-header-label">SMS / WhatsApp Message</div>
+            <div class="sms-from">${sc.from.label}</div>
+          </div>
+        </div>
+        <div class="sms-body">
+          <div class="sms-bubble">${sc.body}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:8px;">${sc.date}</div>
+        </div>
+      </div>`;
+    } else {
+      messageBox = `<div class="sms-box">
+        <div class="sms-header">
+          <span style="font-size:20px;">📞</span>
+          <div>
+            <div class="sms-header-label">Incoming Phone Call — Vishing Scenario</div>
+            <div class="sms-from">${sc.from.label}</div>
+          </div>
+        </div>
+        <div class="sms-body">
+          <div style="font-size:11px;color:#6b7280;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">What the caller said:</div>
+          <div class="sms-bubble" style="border-radius:16px;font-style:italic;">${sc.body}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:8px;">${sc.date}</div>
+        </div>
+      </div>`;
+    }
+
+    html = `<div class="slide active">
+      <div class="scenario-number">${slide.label}</div>
+      <div class="scenario-question">${sc.question}</div>
+      ${messageBox}
+      <div class="options-grid">${optionsHtml}</div>
+      ${feedbackHtml}
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        ${answered ? `<button class="btn btn-primary" onclick="nextSlide()">${index === 6 ? 'See Results →' : 'Next Scenario →'}</button>` : ''}
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'tips') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag tip">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div class="tips-grid" style="margin:20px 0;">
+        <div class="tip-card">
+          <div class="tip-num">01</div>
+          <div class="tip-title">Never Share an OTP Over the Phone</div>
+          <div class="tip-desc">No bank, IT team, or HR department will ever ask for an OTP verbally. The OTP is yours alone — sharing it authorises whatever the attacker wants.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">02</div>
+          <div class="tip-title">Spoofed Sender IDs Are Not Proof</div>
+          <div class="tip-desc">SMS sender names like "VM-BONTON" or "HDFC-Bank" can be faked by anyone. Always verify through official channels before acting on any SMS instruction.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">03</div>
+          <div class="tip-title">Never Install Software on an Unsolicited Call</div>
+          <div class="tip-desc">Legitimate IT support raises tickets through official channels. If someone cold-calls asking you to install AnyDesk, TeamViewer, or similar tools — hang up immediately.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">04</div>
+          <div class="tip-title">Hover or Expand Links Before Tapping</div>
+          <div class="tip-desc">On mobile, long-press links to preview the real URL before tapping. Shortened links (bit.ly, page.link) should always be treated with extra suspicion.</div>
+        </div>
+        <div class="tip-card" style="grid-column: 1 / -1;">
+          <div class="tip-num">05</div>
+          <div class="tip-title">Hang Up and Call Back on a Known Number</div>
+          <div class="tip-desc">If an unsolicited call seems urgent or requests sensitive action, hang up and call back using the official number from the company directory — never a number the caller provides. A real team will always welcome the callback.</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'whattodo') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag warning">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <div class="two-col">
+          <div class="card green-accent">
+            <div class="tag-label green" style="margin-bottom:12px;">✅ DO — Act on These</div>
+            <ul class="check-list">
+              <li>Hang up on suspicious calls immediately</li>
+              <li>Report suspicious SMS/WhatsApp messages to IT Security</li>
+              <li>Call back using a number from the <strong>official company directory</strong></li>
+              <li>Block and report the number to your mobile carrier</li>
+              <li>Screenshot the message before deleting, for reporting</li>
+              <li>Verify HR or Finance requests through official internal systems only</li>
+            </ul>
+          </div>
+          <div class="card red-accent">
+            <div class="tag-label red" style="margin-bottom:12px;">❌ DO NOT — Avoid These</div>
+            <ul class="check-list">
+              <li>Share OTPs, passwords, or PINs over any phone call</li>
+              <li>Install remote access software on an unsolicited call</li>
+              <li>Tap links in unexpected SMS or WhatsApp messages</li>
+              <li>Assume a caller is genuine because they know your name or details</li>
+              <li>Call back on a number provided by the suspicious caller</li>
+              <li>Submit bank or personal details via WhatsApp or SMS links</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card blue-accent" style="padding:16px 20px;">
+          <div class="tag-label" style="color:#004e89;">📞 GOLDEN RULE — When In Doubt</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">Hang up. Look up the number yourself. Call back. A real bank, IT team, or colleague will always be fine with you verifying before acting — only an attacker needs you to act right now without stopping to think.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'checklist') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:16px;font-weight:500;">Before acting on any SMS, WhatsApp message, or phone call, run through this checklist.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;padding:8px 14px;border-radius:8px;background:linear-gradient(135deg,#0077b6,#00b4d8);">
+            <span style="color:white;font-weight:800;font-size:12px;">#</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Check</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;text-align:center;">Priority</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">1</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is the caller or sender asking for an OTP, password, or remote access? If yes — it is always fraudulent.</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">CRITICAL</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">2</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Did the SMS link domain match an official company domain (e.g., bontonfurniture.net)?</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">CRITICAL</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">3</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Was this call or message expected, or did it arrive without prior context?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">4</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is there unusual urgency, a tight deadline, or instruction to keep it secret?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">5</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is the message asking you to update financial details (bank account, salary info) via SMS or WhatsApp?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">6</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Does the message use a shortened link (bit.ly, page.link, tinyurl) that hides the destination?</span>
+            <span style="text-align:center;background:#eef5fb;color:#004e89;border:1px solid #90c4e4;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MEDIUM</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">7</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Can you verify this request through an official channel (internal directory, official website) independently?</span>
+            <span style="text-align:center;background:#eef5fb;color:#004e89;border:1px solid #90c4e4;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MEDIUM</span>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">See My Score →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'score') {
+    const score = answers.filter((a, i) => a === scenarios[i].correct).length;
+    const pct = Math.round((score / 4) * 100);
+    const deg = Math.round((pct / 100) * 360);
+    let msg, sub;
+    if (score === 4) { msg = "Outstanding! 🏆"; sub = "You correctly identified all four smishing and vishing attempts. You are a valuable line of defence for Bonton Furniture."; }
+    else if (score === 3) { msg = "Great Work! 👍"; sub = "You identified 3 out of 4 attacks. Review the scenario you missed to sharpen your awareness of phone-based threats."; }
+    else if (score === 2) { msg = "Good Effort 🎯"; sub = "You identified 2 out of 4 attacks. Review the explanations carefully and consider retaking this training."; }
+    else { msg = "Keep Practising 📚"; sub = "Phone-based attacks are among the most convincing. Review each explanation and retake this module to build your defences."; }
+
+    const reviewItems = scenarios.map((sc, i) => {
+      const pass = answers[i] === sc.correct;
+      return `<div class="review-item ${pass ? 'pass' : 'fail'}">
+        <div class="review-item-label">Scenario ${i+1} — ${pass ? '✅ Correct' : '❌ Missed'}</div>
+        <div class="review-item-text">${pass ? 'Great — you spotted the key indicator.' : `Correct answer: ${sc.options[sc.correct]}`}</div>
+      </div>`;
+    }).join('');
+
+    html = `<div class="slide active score-slide">
+      <h2 style="color:#0d1f2d;margin-bottom:20px;">Series 2 Complete!</h2>
+      <div class="score-circle" style="--score-deg:${deg}deg">
+        <div class="score-inner">
+          <span class="score-number">${score}/4</span>
+          <span class="score-label">${pct}%</span>
+        </div>
+      </div>
+      <div class="score-message">${msg}</div>
+      <div class="score-sub">${sub}</div>
+      <div class="review-cards">${reviewItems}</div>
+      <div class="btn-group center" style="margin-top:24px;">
+        <button class="btn btn-outline" onclick="restartTraining()">🔄 Retake Training</button>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (currentSlide / (slides.length - 1)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  const labels = ['Introduction','Series 2 Focus','Smishing vs Vishing','Scenario 1','Scenario 2','Scenario 3','Scenario 4','Golden Rules','What To Do','Quick Reference','Your Results'];
+  document.getElementById('progressLabel').textContent = labels[currentSlide] || '';
+}
+
+function nextSlide() {
+  if (currentSlide < slides.length - 1) { currentSlide++; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+function prevSlide() {
+  if (currentSlide > 0) { currentSlide--; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+function selectAnswer(qIdx, optionIdx) {
+  answers[qIdx] = optionIdx;
+  renderSlide(currentSlide);
+}
+function restartTraining() {
+  answers = [null, null, null, null];
+  currentSlide = 0;
+  renderSlide(0);
+  window.scrollTo(0,0);
+}
+
+renderSlide(0);
+</script>
+<footer class="site-footer">
+  <span>🔒 Training prepared by</span>
+  <strong>Corepath IT Consulting</strong>
+  <span class="footer-divider">·</span>
+  <span>Cybersecurity Awareness Programme — Series 2</span>
+  <span class="footer-divider">·</span>
+  <span>Confidential — Internal Use Only</span>
+</footer>
+</body>
+</html>
