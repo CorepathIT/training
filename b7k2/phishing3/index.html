@@ -1,1 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Awareness Training — Series 3</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1a2a3a; min-height: 100vh; }
+
+  .top-bar { background: linear-gradient(135deg, #0077b6, #00b4d8); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar-logo { color: white; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .top-bar-logo span { opacity: 0.85; font-weight: 400; }
+
+  #app { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .progress-container { background: #e8f0f8; border-radius: 20px; height: 8px; margin-bottom: 24px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #0077b6, #00b4d8); border-radius: 20px; transition: width 0.6s ease; }
+  .progress-label { text-align: right; font-size: 12px; color: #334e68; margin-bottom: 6px; font-weight: 600; }
+
+  .slide { display: none; animation: fadeIn 0.5s ease; }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .title-slide { text-align: center; padding: 40px 20px; }
+  .shield-icon { font-size: 72px; margin-bottom: 20px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+  .title-slide h1 { font-size: 2.4em; font-weight: 800; background: linear-gradient(90deg, #0077b6, #00b4d8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .title-slide .subtitle { color: #1e3a52; font-size: 1.1em; margin-bottom: 30px; font-weight: 500; }
+  .module-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .pill { background: #dceefb; border: 1px solid #90c4e4; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #004e89; font-weight: 700; }
+  .prepared-by-title { font-size: 13px; color: #1e3a52; margin-bottom: 32px; letter-spacing: 0.3px; font-weight: 500; }
+  .prepared-by-title strong { color: #0077b6; }
+
+  .slide-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .slide-tag { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .slide-tag.warning { background: linear-gradient(135deg, #e63946, #c1121f); }
+  .slide-tag.tip { background: linear-gradient(135deg, #2d6a4f, #40916c); }
+  .slide-title { font-size: 1.6em; font-weight: 700; color: #0d1f2d; }
+
+  .card { background: #f0f6fd; border: 1px solid #b8d9f5; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card.red-accent { border-left: 4px solid #e63946; background: #fff2f3; }
+  .card.blue-accent { border-left: 4px solid #00b4d8; }
+  .card.green-accent { border-left: 4px solid #40916c; background: #eef8f2; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width:600px){ .two-col{grid-template-columns:1fr;} }
+
+  .tag-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1e3a52; margin-bottom: 8px; }
+  .tag-label.red { color: #b91c1c; }
+  .tag-label.green { color: #166534; }
+  ul.check-list { list-style: none; }
+  ul.check-list li { padding: 6px 0; padding-left: 24px; position: relative; font-size: 14px; color: #0d1f2d; line-height: 1.5; }
+  ul.check-list li::before { content: '✦'; position: absolute; left: 0; color: #0077b6; font-size: 12px; top: 8px; }
+
+  .scenario-number { font-size: 12px; color: #1e3a52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; }
+  .scenario-question { font-size: 1.2em; color: #0d1f2d; font-weight: 700; margin-bottom: 20px; line-height: 1.5; }
+
+  .email-box { background: #f9fafc; color: #0d1f2d; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 2px solid #e63946; }
+  .email-header { background: #e4edf7; padding: 14px 18px; border-bottom: 1px solid #c0d4e8; }
+  .email-row { display: flex; gap: 10px; margin-bottom: 5px; font-size: 13px; }
+  .email-field { color: #1e3a52; font-weight: 700; width: 60px; flex-shrink: 0; }
+  .email-value { color: #0d1f2d; font-weight: 500; }
+  .email-value.suspicious { color: #b91c1c; font-weight: 700; }
+  .email-body { padding: 16px 18px; font-size: 13.5px; line-height: 1.8; color: #0d1f2d; background: #ffffff; }
+  .email-link { color: #0055a5; text-decoration: underline; font-weight: 700; }
+  .email-link.bad { color: #b91c1c; font-weight: 700; }
+
+  .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .option-btn { background: #eef5fb; border: 2px solid #90c4e4; border-radius: 10px; padding: 14px 18px; text-align: left; cursor: pointer; color: #0d1f2d; font-size: 14px; font-family: inherit; transition: all 0.2s; line-height: 1.5; font-weight: 500; }
+  .option-btn:hover:not(:disabled) { border-color: #0077b6; background: #dceefb; transform: translateX(4px); }
+  .option-btn.correct { border-color: #166534; background: #dcfce7; color: #14532d; font-weight: 700; }
+  .option-btn.wrong { border-color: #b91c1c; background: #fee2e2; color: #7f1d1d; font-weight: 600; }
+  .option-btn:disabled { cursor: default; transform: none; }
+
+  .feedback { border-radius: 10px; padding: 18px; margin-bottom: 20px; display: none; }
+  .feedback.correct { background: #dcfce7; border: 2px solid #166534; }
+  .feedback.wrong { background: #fee2e2; border: 2px solid #b91c1c; }
+  .feedback-icon { font-size: 24px; margin-bottom: 8px; }
+  .feedback-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feedback.correct .feedback-title { color: #14532d; }
+  .feedback.wrong .feedback-title { color: #7f1d1d; }
+  .feedback-text { font-size: 13px; color: #0d1f2d; line-height: 1.6; font-weight: 500; }
+
+  .score-slide { text-align: center; padding: 20px; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(#00b4d8 0deg, #0077b6 var(--score-deg), #c8dff0 var(--score-deg)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+  .score-inner { width: 110px; height: 110px; border-radius: 50%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #b8d9f5; }
+  .score-number { font-size: 2.2em; font-weight: 800; color: #004e89; }
+  .score-label { font-size: 11px; color: #1e3a52; font-weight: 700; }
+  .score-message { font-size: 1.3em; font-weight: 700; margin-bottom: 10px; color: #0d1f2d; }
+  .score-sub { font-size: 14px; color: #1e3a52; margin-bottom: 30px; font-weight: 500; }
+  .review-cards { text-align: left; }
+  .review-item { background: #f0f6fd; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; border-left: 4px solid; }
+  .review-item.pass { border-color: #166534; background: #dcfce7; }
+  .review-item.fail { border-color: #b91c1c; background: #fee2e2; }
+  .review-item-label { font-size: 11px; color: #1e3a52; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .review-item-text { font-size: 13px; color: #0d1f2d; font-weight: 500; }
+
+  .btn { border: none; border-radius: 8px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #0077b6, #00b4d8); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 2px solid #0077b6; color: #0055a5; font-weight: 700; }
+  .btn-outline:hover { border-color: #004e89; background: #dceefb; color: #004e89; }
+  .btn-group { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-group.center { justify-content: center; }
+
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media(max-width:600px){ .tips-grid{grid-template-columns:1fr;} }
+  .tip-card { background: #f0f6fd; border-radius: 10px; padding: 18px; border: 1px solid #b8d9f5; border-top: 3px solid #0077b6; }
+  .tip-num { font-size: 28px; font-weight: 800; color: #90c4e4; margin-bottom: 6px; }
+  .tip-title { font-size: 13px; font-weight: 700; color: #004e89; margin-bottom: 6px; }
+  .tip-desc { font-size: 12px; color: #1e3a52; line-height: 1.5; font-weight: 500; }
+
+  .red-flag-tag { display: inline-block; background: #fee2e2; color: #7f1d1d; border: 1px solid #b91c1c; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; margin: 2px; }
+
+  .site-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #e8f2fa; border-top: 2px solid #90c4e4; padding: 10px 24px; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 100; }
+  .site-footer span { font-size: 12px; color: #1e3a52; font-weight: 600; }
+  .site-footer strong { color: #004e89; font-size: 12px; font-weight: 700; }
+  .footer-divider { color: #90c4e4; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="top-bar-logo">🛡️ <span>Phishing Awareness Training — Series 3</span></div>
+</div>
+<div id="app">
+  <div class="progress-label" id="progressLabel">Introduction</div>
+  <div class="progress-container"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div id="slides"></div>
+</div>
+
+<script>
+(function(){
+  const pwd = prompt("Enter Password To Access The Training:");
+  if(pwd !== "Bonton2026"){
+    document.body.innerHTML = `
+      <div style="text-align:center; margin-top:150px; font-family:Arial;">
+        <h2 style="color:#e63946;">⛔ Access Denied</h2>
+        <p style="color:#1e3a52;">Contact your IT team for access.</p>
+      </div>`;
+  }
+})();
+
+const slides = [
+  { type: 'title' },
+  { type: 'info', tag: 'Series 3 Focus', title: 'Spear Phishing — Attacks That Know Your Name', content: 'info1' },
+  { type: 'info', tag: 'Key Concepts', title: 'Mass Phishing vs. Spear Phishing vs. Whaling', content: 'info2' },
+  { type: 'quiz', scenarioNum: 1, label: 'Scenario 1 of 4 — LinkedIn-Sourced Spear Phish' },
+  { type: 'quiz', scenarioNum: 2, label: 'Scenario 2 of 4 — Vendor Onboarding Email' },
+  { type: 'quiz', scenarioNum: 3, label: 'Scenario 3 of 4 — Supplier Bank Detail Change' },
+  { type: 'quiz', scenarioNum: 4, label: 'Scenario 4 of 4 — Internal Audit Email' },
+  { type: 'info', tag: 'Best Practices', title: '5 Golden Rules for Spear Phishing Defence', content: 'tips' },
+  { type: 'info', tag: 'Action Plan', title: 'When You Spot a Targeted Attack — What To Do', content: 'whattodo' },
+  { type: 'info', tag: 'Quick Reference', title: 'Spear Phishing Detection Checklist', content: 'checklist' },
+  { type: 'score' }
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCENARIO DESIGN NOTES (for trainer reference):
+//
+// All 4 scenarios show emails arriving IN a Bonton Furniture employee's inbox.
+// The attacker is ALWAYS the sender. Bonton employee is ALWAYS the receiver.
+// Each scenario introduces its own named Bonton employee ONCE — in the
+// context banner above the email. No persona is set globally on the title slide.
+//
+// Sender domains are believable external addresses — NOT fake Bonton domains.
+// Email body content matches the sender identity and the recipient identity.
+// Language is plain and simple throughout — no IT jargon.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const scenarios = [
+  {
+    // SCENARIO 1: External supplier pretends to be interested in collaboration.
+    // Sender is from a real-looking but fake supplier domain.
+    // Recipient is Arjun Sharma — Bonton's Procurement Manager.
+    // The body greets Arjun by name and references his real LinkedIn post.
+    // Red flag: sender email domain has a typo, and the link goes to a suspicious site.
+    from: {
+      displayName: "Priya Sharma",
+      email: "priya.sharma@pune-buildmaterials.com",
+      suspicious: true
+    },
+    to: {
+      displayName: "Arjun Sharma",
+      email: "arjun.sharma@bontonfurniture.net"
+    },
+    whoAmI: "You are <strong>Arjun Sharma, Procurement Manager at Bonton Furniture, Indore.</strong> This email has just arrived in your inbox.",
+    subject: "Your LinkedIn Post — Interested in Supplying Sustainable Materials",
+    date: "Monday, 7 April 2026, 11:02 AM",
+    body: `Dear Arjun,<br><br>I saw your recent post on LinkedIn about Bonton Furniture looking for sustainable material suppliers — very interesting! My name is Priya Sharma and I work as Head of Partnerships at Pune Build Materials Pvt. Ltd.<br><br>We supply eco-friendly upholstery fabrics and wood composites to furniture companies across India. I think we could be a good fit for Bonton.<br><br>I have put together a short product list with prices. Please click the link below to view it:<br><br><span class="email-link bad">http://bonton-suppliers.net/catalogues/priya-sharma-intro.pdf</span><br><br>I look forward to hearing from you!<br><br>Best regards,<br>Priya Sharma<br>Head of Partnerships, Pune Build Materials Pvt. Ltd.<br>priya.sharma@pune-buildmaterials.com`,
+    question: "This email arrived in Arjun's inbox. Priya mentions his actual LinkedIn post and her offer seems relevant. What is the biggest warning sign in this email?",
+    options: [
+      "Priya should have called first instead of sending an email.",
+      "The sender's email is from 'pune-buildmaterials.com' but the link goes to a completely different website — 'bonton-suppliers.net' — which has nothing to do with Priya or her company.",
+      "The email is too casual and friendly for a business introduction.",
+      "Priya found Arjun through LinkedIn, which means she is researching Bonton."
+    ],
+    correct: 1,
+    explanation: "Arjun received this email from someone outside Bonton. The sender's email address looks real — it matches her company name. But the link in the email goes to a website called 'bonton-suppliers.net' which has nothing to do with Priya or Pune Build Materials. A genuine supplier would share a link that goes to their own company website. When a link takes you somewhere completely different from where it should go — that is the biggest warning sign. Do not click such links. You can always call the supplier directly to verify if they really sent you something.",
+    redFlags: ["Link goes to a different website — not the supplier's own site", "Unsolicited email with a link to click", "Sender used your LinkedIn post to make the email feel personal and trustworthy"]
+  },
+
+  {
+    // SCENARIO 2: Attacker pretends to be from Mehta & Sons sending an onboarding
+    // request TO Bonton's procurement team. Story: Bonton has been talking to
+    // Mehta & Sons about becoming a vendor. The attacker (pretending to be Mehta)
+    // asks Bonton procurement to submit Mehta's bank/KYC details via a fake link.
+    // This is realistic — procurement staff would expect to register a new vendor.
+    // Red flag: the link goes to a random website, not Mehta's real website.
+    from: {
+      displayName: "Mehta & Sons — Vendor Team",
+      email: "vendor.team@mehtaandsons-furniture.com",
+      suspicious: true
+    },
+    to: {
+      displayName: "Procurement Team, Bonton Furniture",
+      email: "procurement@bontonfurniture.net"
+    },
+    whoAmI: "You are <strong>Sunita Rao, a member of the Procurement Team at Bonton Furniture, Indore.</strong> Your team has been in talks with Mehta & Sons about adding them as a fabric supplier. This email has just arrived in your team inbox.",
+    subject: "Next Steps — Please Complete Mehta & Sons Vendor Registration",
+    date: "Tuesday, 8 April 2026, 2:15 PM",
+    body: `Dear Bonton Procurement Team,<br><br>Thank you for your interest in working with Mehta & Sons Furniture Pvt. Ltd. We are happy to move ahead as a registered vendor for Bonton Furniture.<br><br>To complete our registration in your vendor system, please submit our company details — including our bank account and GST information — using the secure vendor registration form at the link below. This step must be completed within 48 hours to keep the process moving.<br><br><span class="email-link bad">[ COMPLETE VENDOR REGISTRATION → http://vendorkyc-india.com/bonton/mehta/register ]</span><br><br>You will also need to upload a cancelled cheque and our GST certificate on that form.<br><br>Thank you,<br>Vendor Registration Team<br>Mehta & Sons Furniture Pvt. Ltd.`,
+    question: "Your team is in talks with Mehta & Sons. This email arrives asking you to complete their vendor registration. What should you check first?",
+    options: [
+      "The 48-hour deadline feels rushed — ask for more time.",
+      "The link in the email goes to a website called 'vendorkyc-india.com' which has nothing to do with Bonton Furniture or Mehta & Sons. Never enter sensitive company details on a link like this.",
+      "The email should have come from within Bonton's own system.",
+      "The vendor name matches the company your team is already talking to, so it is safe."
+    ],
+    correct: 1,
+    explanation: "Sunita's team received this email from someone pretending to be Mehta & Sons. The attacker knew Bonton and Mehta were already in talks — probably from a LinkedIn post or news announcement — and sent this fake email at exactly the right time. The link goes to 'vendorkyc-india.com' — a random website that has no connection to either Bonton Furniture or Mehta & Sons. Legitimate vendor registration is done through Bonton's own internal system, not through an outside website. Before doing anything, call Mehta & Sons directly on a phone number you already have and confirm they sent this email.",
+    redFlags: ["Link goes to a random website — not Bonton's own system or Mehta's website", "Email timed to arrive when real talks are happening", "Asking for bank details and documents via an external link", "48-hour pressure to act quickly"]
+  },
+
+  {
+    // SCENARIO 3: Attacker pretends to be Apex Fabrics (an existing Bonton supplier)
+    // and asks Bonton's accounts team to update bank payment details.
+    // Sender uses a fake email that looks similar to Apex Fabrics' real one.
+    // Recipient is Ramesh Patil — Bonton Accounts Manager.
+    // Body is clear: Apex (supplier) is asking Bonton (customer) to pay to a new account.
+    // Red flag: email address domain is slightly wrong. No prior phone call was made.
+    from: {
+      displayName: "Ravi Kumar, Finance Manager — Apex Fabrics",
+      email: "ravi.kumar@apexfabrics-payments.net",
+      suspicious: true
+    },
+    to: {
+      displayName: "Ramesh Patil — Accounts Manager, Bonton Furniture",
+      email: "ramesh.patil@bontonfurniture.net"
+    },
+    whoAmI: "You are <strong>Ramesh Patil, Accounts Manager at Bonton Furniture, Indore.</strong> Apex Fabrics is a supplier that Bonton pays every month for upholstery fabric. This email has just arrived in your inbox.",
+    subject: "Important — Please Update Our Bank Account for Your Next Payment",
+    date: "Wednesday, 9 April 2026, 10:30 AM",
+    body: `Dear Ramesh,<br><br>I hope you are well. Please note that Apex Fabrics has recently changed our bank. Going forward, please send all payments from Bonton Furniture to our new account:<br><br><strong>Bank:</strong> ICICI Bank<br><strong>Account Name:</strong> Apex Fabrics Pvt. Ltd.<br><strong>Account Number:</strong> 0042 8867 9901<br><strong>IFSC Code:</strong> ICIC0004201<br><strong>Branch:</strong> Andheri East, Mumbai<br><br>Please update this in your records before the next payment. Kindly confirm by replying to this email once done.<br><br>Thank you,<br>Ravi Kumar<br>Finance Manager<br>Apex Fabrics Pvt. Ltd.`,
+    question: "Ramesh knows Apex Fabrics well — they are a regular supplier. This email asks him to update their bank account before the next payment. What is the right thing to do?",
+    options: [
+      "Update the bank account straightaway — the next payment is coming up soon.",
+      "Reply to this email to say the update has been done.",
+      "Do not make any changes yet. Call Apex Fabrics on their usual phone number — not a number from this email — and ask them directly if they have changed their bank account.",
+      "Ask the sender to send the request on company letterhead."
+    ],
+    correct: 2,
+    explanation: "Ramesh received this email from someone pretending to be Apex Fabrics. Look carefully at the sender's email — it says 'apexfabrics-payments.net' which is NOT Apex Fabrics' real email address. The real address would be something like '@apexfabrics.com'. This is a trick — the email address looks similar but is actually fake. The goal of this email is simple: to trick Bonton into sending its next payment to the attacker's bank account instead of Apex Fabrics' real account. The safest thing to do is to call Apex Fabrics directly using the phone number you already have in your records — not any number mentioned in this email. One phone call can save Bonton from losing lakhs of rupees.",
+    redFlags: ["Sender email domain is wrong — 'apexfabrics-payments.net' is not the real Apex Fabrics email", "No prior phone call from Apex Fabrics to inform about the bank change", "Asking to 'confirm by reply' — this keeps you talking only to the attacker", "Urgency around the upcoming payment"]
+  },
+
+  {
+    // SCENARIO 4: Attacker pretends to be Bonton's own Internal Audit team.
+    // Sender uses a fake domain that looks like an internal Bonton address.
+    // Recipient is Arjun Sharma — back to our Procurement Manager.
+    // Body addresses Arjun by name and sounds official.
+    // Red flag: sender email domain has "-internal" added, link goes outside Bonton.
+    // Secrecy instruction is an additional red flag.
+    from: {
+      displayName: "Internal Audit Committee — Bonton Furniture",
+      email: "audit.team@bontonfurniture-internal.com",
+      suspicious: true
+    },
+    to: {
+      displayName: "Arjun Sharma — Procurement Manager, Bonton Furniture",
+      email: "arjun.sharma@bontonfurniture.net"
+    },
+    whoAmI: "You are <strong>Arjun Sharma, Procurement Manager at Bonton Furniture, Indore.</strong> This email has just arrived in your inbox, appearing to come from Bonton's own Audit team.",
+    subject: "Action Required — Submit Your Department Expense Summary by Friday",
+    date: "Thursday, 10 April 2026, 8:50 AM",
+    body: `Dear Arjun,<br><br>The Internal Audit Committee is currently carrying out a routine review of department expenses for the financial year 2025–26.<br><br>As Procurement Manager, we need you to submit a summary of all expense claims above INR 10,000 from your team for the past 12 months. Please upload this to the secure audit portal using the link below before Friday, 5:00 PM:<br><br><span class="email-link bad">http://bonton-auditportal.in/compliance/fy2026/upload</span><br><br>Please keep this request confidential and do not discuss it with other team members until the audit is complete. If you have questions, please reply directly to this email only.<br><br>Thank you,<br>Internal Audit Committee<br>Bonton Furniture`,
+    question: "This email looks like it came from Bonton's own Audit team and is addressed to Arjun by name. What are the warning signs that this is a fake email?",
+    options: [
+      "A Friday deadline is too short for submitting expense data.",
+      "Real audit teams never ask for expense information.",
+      "The sender's email address ends in 'bontonfurniture-internal.com' — this is NOT Bonton's real email address. Bonton's real email ends in 'bontonfurniture.net'. Also, the upload link goes to an outside website, and the email tells Arjun to keep it secret from his colleagues.",
+      "The email did not come through Arjun's manager first."
+    ],
+    correct: 2,
+    explanation: "Arjun received this email from someone pretending to be Bonton's own Audit team. It looks very convincing — it uses his name, mentions a real process (expense review), and sounds official. But look at the sender's email address: it ends in 'bontonfurniture-internal.com'. Bonton Furniture's real email addresses end in 'bontonfurniture.net'. The '-internal.com' part has been added by the attacker to look like an inside email. The upload link also goes to an outside website — 'bonton-auditportal.in' — not Bonton's own systems. And the instruction to keep it secret is designed to stop Arjun from checking with his manager or colleagues. A real internal audit would always be announced through proper channels, confirmed by management, and use Bonton's own internal systems — never an outside website.",
+    redFlags: ["Sender email ends in 'bontonfurniture-internal.com' — not Bonton's real email 'bontonfurniture.net'", "Upload link goes to an outside website, not Bonton's own system", "Told to keep the request secret from colleagues", "No prior announcement from management about any audit"]
+  }
+];
+
+let currentSlide = 0;
+let answers = [null, null, null, null];
+let quizSlideMap = { 3: 0, 4: 1, 5: 2, 6: 3 };
+
+function renderSlide(index) {
+  const container = document.getElementById('slides');
+  const slide = slides[index];
+  let html = '';
+
+  if (slide.type === 'title') {
+    html = `<div class="slide active title-slide">
+      <div class="shield-icon">🛡️</div>
+      <h1>Phishing Awareness Training</h1>
+      <div class="subtitle">Series 3 — Targeted Email Scams</div>
+      <div class="module-pills">
+        <span class="pill">🎯 Targeted Scam Emails</span>
+        <span class="pill">🏢 Fake Vendor Emails</span>
+        <span class="pill">💰 Payment Fraud</span>
+        <span class="pill">🏆 Score & Review</span>
+      </div>
+      <div class="prepared-by-title">A Cybersecurity Awareness Programme by <strong>Corepath IT Consulting</strong></div>
+      <p style="color:#1e3a52;font-size:13px;margin-bottom:30px;">This is <strong style="color:#004e89">Series 3</strong> of your Phishing Awareness Training. In this module, you will see four emails that arrived in a Bonton Furniture employee's inbox. Each email was sent by a scammer who has done some research to make their email look real. Your job is to spot the warning signs. Approximately <strong style="color:#004e89">10–15 minutes</strong>.</p>
+      <div class="btn-group center">
+        <button class="btn btn-primary" onclick="nextSlide()">Start Training →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info1') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">In Series 1 and 2, we looked at fake emails sent to thousands of people at once. In Series 3, we look at something more dangerous — scam emails written specifically for <strong>you</strong>. The scammer has looked you up first, and then written an email that feels personal and real.</p>
+        <div class="two-col">
+          <div class="card red-accent">
+            <div class="tag-label red">🔍 How Scammers Find Out About You</div>
+            <ul class="check-list">
+              <li>Your LinkedIn profile — your job title and recent posts</li>
+              <li>Bonton's website — names of staff and departments</li>
+              <li>News articles or press releases about Bonton</li>
+              <li>Social media posts about company events or new projects</li>
+            </ul>
+          </div>
+          <div class="card blue-accent">
+            <div class="tag-label" style="color:#004e89">⚡ Why These Emails Are Harder to Spot</div>
+            <ul class="check-list">
+              <li>They use your real name and job title</li>
+              <li>They mention something actually happening at Bonton right now</li>
+              <li>They feel like they are from someone who knows you</li>
+              <li>They often target people in Accounts, Procurement, and HR</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="background:#eef5fb;text-align:center;padding:20px;border:1px solid #b8d9f5;">
+          <div style="font-size:2em;margin-bottom:8px;">💸</div>
+          <div style="font-size:22px;font-weight:800;color:#004e89;margin-bottom:4px;">INR 1.2 Crore+</div>
+          <div style="font-size:13px;color:#0d1f2d;font-weight:600;">Average amount lost by a mid-size Indian company in a single payment fraud case in 2024</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'info2') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:20px;font-weight:500;">Scam emails come in different types. Knowing the difference helps you understand why some are harder to spot than others.</p>
+        <div class="card" style="margin-bottom:12px;border-left:4px solid #00b4d8;">
+          <div class="tag-label" style="color:#004e89;">📧 TYPE 1 — Bulk Scam Emails (Series 1)</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">The same email is sent to thousands of people at once. These are usually easy to catch — wrong name, spelling mistakes, or content that makes no sense for your job.</p>
+        </div>
+        <div class="card red-accent" style="margin-bottom:12px;">
+          <div class="tag-label red">🎯 TYPE 2 — Targeted Scam Emails (This Series)</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">The scammer writes the email specifically for you — using your name, your role, and something currently happening at Bonton. These are much harder to spot because they feel real. The most reliable check is always the sender's email address and any links in the email.</p>
+        </div>
+        <div class="card" style="border-left:4px solid #e63946;background:#fff2f3;border:1px solid #f5c6cb;border-left:4px solid #e63946;margin-bottom:12px;">
+          <div class="tag-label red">🐳 TYPE 3 — Scams Targeting Top Management</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">These are targeted specifically at company owners, directors, and senior managers. The scammer may spend weeks researching the person before sending the email or making a call. These can lead to very large financial losses.</p>
+        </div>
+        <div class="card green-accent" style="padding:16px 20px;">
+          <div class="tag-label green">💡 THE ONE THING TO ALWAYS CHECK</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">No matter how convincing an email feels — always check the sender's full email address and where any link actually goes. A scammer cannot use Bonton Furniture's real email address. That is always your most reliable clue.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Start Scenarios →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'quiz') {
+    const qIdx = quizSlideMap[index];
+    const sc = scenarios[qIdx];
+    const answered = answers[qIdx] !== null;
+
+    const optionsHtml = sc.options.map((opt, i) => {
+      let cls = '';
+      if (answered) {
+        if (i === sc.correct) cls = 'correct';
+        else if (i === answers[qIdx]) cls = 'wrong';
+      }
+      return `<button class="option-btn ${cls}" ${answered ? 'disabled' : ''} onclick="selectAnswer(${qIdx}, ${i})">${String.fromCharCode(65+i)}. ${opt}</button>`;
+    }).join('');
+
+    const feedbackHtml = answered ? `
+      <div class="feedback ${answers[qIdx] === sc.correct ? 'correct' : 'wrong'}" style="display:block">
+        <div class="feedback-icon">${answers[qIdx] === sc.correct ? '✅' : '❌'}</div>
+        <div class="feedback-title">${answers[qIdx] === sc.correct ? 'Correct! Well spotted.' : 'Not quite — here is what to look for.'}</div>
+        <div class="feedback-text">${sc.explanation}</div>
+        <div style="margin-top:12px;">
+          <strong style="color:#1e3a52;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Warning signs in this email:</strong>
+          <div style="margin-top:6px;">${sc.redFlags.map(f => `<span class="red-flag-tag">${f}</span>`).join(' ')}</div>
+        </div>
+      </div>` : '';
+
+    html = `<div class="slide active">
+
+      <div class="scenario-number">${slide.label}</div>
+      <div class="scenario-question">${sc.question}</div>
+
+      <!-- WHO AM I — introduces the Bonton employee ONCE, specific to this scenario -->
+      <div style="background:#fff7e6;border:2px solid #fbbf24;border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:20px;margin-top:1px;">👤</span>
+        <p style="font-size:13px;color:#0d1f2d;font-weight:500;line-height:1.6;margin:0;">${sc.whoAmI}</p>
+      </div>
+
+      <!-- EMAIL REPLICA -->
+      <div class="email-box">
+        <div class="email-header">
+
+          <!-- FROM: sender is the attacker — shown in red with warning badge -->
+          <div class="email-row" style="align-items:flex-start;margin-bottom:8px;">
+            <span class="email-field" style="color:#b91c1c;font-weight:800;min-width:65px;">From:</span>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+              <span style="color:#b91c1c;font-weight:700;font-size:13px;">${sc.from.displayName}</span>
+              <span style="color:#9b1c1c;font-size:12px;font-weight:500;">&lt;${sc.from.email}&gt;</span>
+              <span style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;border-radius:4px;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.5px;white-space:nowrap;">⚠ CHECK THIS EMAIL ADDRESS</span>
+            </div>
+          </div>
+
+          <!-- TO: receiver is the Bonton employee — shown in blue with YOU badge -->
+          <div class="email-row" style="align-items:flex-start;margin-bottom:8px;">
+            <span class="email-field" style="color:#0077b6;font-weight:800;min-width:65px;">To:</span>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+              <span style="color:#0077b6;font-weight:700;font-size:13px;">${sc.to.displayName}</span>
+              <span style="color:#1e4d7a;font-size:12px;font-weight:500;">&lt;${sc.to.email}&gt;</span>
+              <span style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:4px;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.5px;white-space:nowrap;">📥 YOU — BONTON FURNITURE</span>
+            </div>
+          </div>
+
+          <div class="email-row" style="margin-bottom:4px;">
+            <span class="email-field" style="min-width:65px;">Subject:</span>
+            <span class="email-value" style="font-weight:600;">${sc.subject}</span>
+          </div>
+          <div class="email-row">
+            <span class="email-field" style="min-width:65px;">Date:</span>
+            <span class="email-value">${sc.date}</span>
+          </div>
+
+        </div>
+        <div class="email-body">${sc.body}</div>
+      </div>
+
+      <div class="options-grid">${optionsHtml}</div>
+      ${feedbackHtml}
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        ${answered ? `<button class="btn btn-primary" onclick="nextSlide()">${index === 6 ? 'See My Score →' : 'Next Scenario →'}</button>` : ''}
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'tips') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag tip">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div class="tips-grid" style="margin:20px 0;">
+        <div class="tip-card">
+          <div class="tip-num">01</div>
+          <div class="tip-title">A Personal Email Does Not Mean a Safe Email</div>
+          <div class="tip-desc">Just because an email uses your name or mentions something real at Bonton does not mean it is genuine. Scammers research people before writing. Always check the sender's full email address — not just the name shown.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">02</div>
+          <div class="tip-title">Always Call Before Changing Any Bank Details</div>
+          <div class="tip-desc">If any email asks you to update a supplier's bank account, call the supplier directly using a phone number you already have — not one given in the email. Do not make any payment changes based on an email alone.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">03</div>
+          <div class="tip-title">Think Before You Post About Bonton Online</div>
+          <div class="tip-desc">When you share details about new suppliers, projects, or deals on LinkedIn or social media, scammers can use that information to write very convincing fake emails. Keep sensitive business discussions off social media.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-num">04</div>
+          <div class="tip-title">"Keep This Secret" Is Always a Warning Sign</div>
+          <div class="tip-desc">If an email tells you not to discuss the request with your manager or colleagues — that is a deliberate trick to stop you from getting a second opinion. Always tell your manager about any unusual email request.</div>
+        </div>
+        <div class="tip-card" style="grid-column: 1 / -1;">
+          <div class="tip-num">05</div>
+          <div class="tip-title">Check With Your Manager for Any New or Unusual Request</div>
+          <div class="tip-desc">If you receive an email asking you to add a new vendor, share expense data, or process an unusual payment — always confirm with your manager first, using your normal way of speaking to them (face to face, phone, or internal chat). Never act on an email instruction alone for something big or unusual.</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'whattodo') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag warning">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <div class="two-col">
+          <div class="card green-accent">
+            <div class="tag-label green" style="margin-bottom:12px;">✅ DO — These Steps Keep You Safe</div>
+            <ul class="check-list">
+              <li>Forward suspicious emails to IT Security right away</li>
+              <li>Call the sender directly on a number you already know — not from the email</li>
+              <li>Tell your manager before acting on any unusual email instruction</li>
+              <li>Read the full email address carefully — not just the name shown</li>
+              <li>Hover over any link to see where it actually goes before clicking</li>
+              <li>Take a screenshot of the suspicious email to share with IT Security</li>
+            </ul>
+          </div>
+          <div class="card red-accent">
+            <div class="tag-label red" style="margin-bottom:12px;">❌ DO NOT — Avoid These Mistakes</div>
+            <ul class="check-list">
+              <li>Change a supplier's bank account or make payments based on email alone</li>
+              <li>Click links in unexpected emails and enter your company login details</li>
+              <li>Reply to a suspicious email asking them to prove who they are</li>
+              <li>Trust an email just because it uses your name or mentions a real event</li>
+              <li>Keep an unusual request secret from your manager because the email asked you to</li>
+              <li>Click links in vendor or supplier emails without checking where they go</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card blue-accent" style="padding:16px 20px;">
+          <div class="tag-label" style="color:#004e89;">📞 THE GOLDEN RULE</div>
+          <p style="font-size:13px;color:#0d1f2d;line-height:1.6;font-weight:500;">If an email asks you to do something important — pay money, share data, or change account details — always verify it through a separate channel before doing anything. Call the person directly on a number you already have. A few minutes of checking can save Bonton from losing lakhs of rupees.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Next →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'info' && slide.content === 'checklist') {
+    html = `<div class="slide active info-slide">
+      <div class="slide-header"><span class="slide-tag">${slide.tag}</span></div>
+      <div class="slide-title">${slide.title}</div>
+      <div style="margin:20px 0;">
+        <p style="color:#0d1f2d;font-size:14px;line-height:1.7;margin-bottom:16px;font-weight:500;">These targeted scam emails look very real. Use this quick checklist every time you receive an unusual email asking you to do something.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;padding:8px 14px;border-radius:8px;background:linear-gradient(135deg,#0077b6,#00b4d8);">
+            <span style="color:white;font-weight:800;font-size:12px;">#</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Check</span>
+            <span style="color:white;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;text-align:center;">Priority</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">1</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Read the sender's full email address carefully. Does it look slightly different — extra letters, hyphens, or a different ending like .net instead of .com?</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MUST CHECK</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">2</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Hover over any link in the email. Does it go to a website that has nothing to do with the sender or Bonton Furniture?</span>
+            <span style="text-align:center;background:#fee2e2;color:#b91c1c;border:1px solid #f5c6c6;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">MUST CHECK</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">3</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Is the email asking you to pay money, change bank account details, or share sensitive company data — without your manager knowing?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH RISK</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">4</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Does the email ask you to keep this request secret or not discuss it with your colleagues or manager before acting?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH RISK</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#eef5fb;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">5</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Did this email arrive exactly when something real is happening at Bonton — like a new vendor, an audit, or a payment — which is a little too convenient?</span>
+            <span style="text-align:center;background:#fff7e6;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">HIGH RISK</span>
+          </div>
+          <div style="display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:10px 14px;background:#ffffff;border-radius:8px;border:1px solid #b8d9f5;">
+            <span style="color:#004e89;font-weight:800;font-size:14px;">6</span>
+            <span style="font-size:13px;color:#0d1f2d;font-weight:500;">Have you verified this request by calling the person or company directly using a phone number you already have — not one from the email?</span>
+            <span style="text-align:center;background:#eef5fb;color:#004e89;border:1px solid #90c4e4;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;">VERIFY</span>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="prevSlide()">← Back</button>
+        <button class="btn btn-primary" onclick="nextSlide()">See My Score →</button>
+      </div>
+    </div>`;
+
+  } else if (slide.type === 'score') {
+    const score = answers.filter((a, i) => a === scenarios[i].correct).length;
+    const pct = Math.round((score / 4) * 100);
+    const deg = Math.round((pct / 100) * 360);
+    let msg, sub;
+    if (score === 4) { msg = "Outstanding! 🏆"; sub = "You identified all four targeted attacks. Spear phishing is the hardest category — this result shows real security awareness."; }
+    else if (score === 3) { msg = "Great Work! 👍"; sub = "You identified 3 out of 4 targeted attacks. Review the scenario you missed — spear phishing is where the details really matter."; }
+    else if (score === 2) { msg = "Good Effort 🎯"; sub = "You identified 2 out of 4 targeted attacks. These are the most convincing type of phishing — review each explanation and consider retaking the module."; }
+    else { msg = "Keep Practising 📚"; sub = "Spear phishing is deliberately designed to fool you — review the explanations carefully and retake this training to build your awareness."; }
+
+    const reviewItems = scenarios.map((sc, i) => {
+      const pass = answers[i] === sc.correct;
+      return `<div class="review-item ${pass ? 'pass' : 'fail'}">
+        <div class="review-item-label">Scenario ${i+1} — ${pass ? '✅ Correct' : '❌ Missed'}</div>
+        <div class="review-item-text">${pass ? 'Great — you spotted the key indicator.' : `Correct answer: ${sc.options[sc.correct]}`}</div>
+      </div>`;
+    }).join('');
+
+    html = `<div class="slide active score-slide">
+      <h2 style="color:#0d1f2d;margin-bottom:20px;">Series 3 Complete!</h2>
+      <div class="score-circle" style="--score-deg:${deg}deg">
+        <div class="score-inner">
+          <span class="score-number">${score}/4</span>
+          <span class="score-label">${pct}%</span>
+        </div>
+      </div>
+      <div class="score-message">${msg}</div>
+      <div class="score-sub">${sub}</div>
+      <div class="review-cards">${reviewItems}</div>
+      <div class="btn-group center" style="margin-top:24px;">
+        <button class="btn btn-outline" onclick="restartTraining()">🔄 Retake Training</button>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (currentSlide / (slides.length - 1)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  const labels = ['Introduction','Series 3 Focus','Attack Types','Scenario 1','Scenario 2','Scenario 3','Scenario 4','Golden Rules','What To Do','Quick Reference','Your Results'];
+  document.getElementById('progressLabel').textContent = labels[currentSlide] || '';
+}
+
+function nextSlide() {
+  if (currentSlide < slides.length - 1) { currentSlide++; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+function prevSlide() {
+  if (currentSlide > 0) { currentSlide--; renderSlide(currentSlide); window.scrollTo(0,0); }
+}
+function selectAnswer(qIdx, optionIdx) {
+  answers[qIdx] = optionIdx;
+  renderSlide(currentSlide);
+}
+function restartTraining() {
+  answers = [null, null, null, null];
+  currentSlide = 0;
+  renderSlide(0);
+  window.scrollTo(0,0);
+}
+
+renderSlide(0);
+</script>
+<footer class="site-footer">
+  <span>🔒 Training prepared by</span>
+  <strong>Corepath IT Consulting</strong>
+  <span class="footer-divider">·</span>
+  <span>Cybersecurity Awareness Programme — Series 3</span>
+  <span class="footer-divider">·</span>
+  <span>Confidential — Internal Use Only</span>
+</footer>
+</body>
+</html>
 
